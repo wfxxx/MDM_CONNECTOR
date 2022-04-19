@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.definesys.mdm.connector.mapper.MdmSubIdMapMapper">
+
+    <resultMap id="BaseResultMap" type="com.definesys.mdm.connector.entity.MdmSubIdMap">
+        <result column="FORM_ID" jdbcType="VARCHAR" property="formId" />
+        <result column="SUB_TB_PK_ID" jdbcType="VARCHAR" property="subTbPkId" />
+        <result column="MDM_ID" jdbcType="VARCHAR" property="mdmId" />
+        <result column="MDM_SUB_ID" jdbcType="VARCHAR" property="mdmSubId" />
+        <result column="ESB_ID" jdbcType="VARCHAR" property="esbId" />
+        <result column="ESB_SUB_ID" jdbcType="VARCHAR" property="esbSubId" />
+    </resultMap>
+
+    <select id="getSubIdMap"  resultMap="BaseResultMap">
+        select FORM_ID,SUB_TB_PK_ID,MDM_ID,MDM_SUB_ID,ESB_ID,ESB_SUB_ID from MDM_SUB_ID_MAP where FORM_ID = #{formId} AND SUB_TB_PK_ID = #{uuId} AND ESB_ID = #{esbId} AND ESB_SUB_ID = #{esbSubId}
+    </select>
+
+    <insert id="insertSubIdMap">
+        INSERT INTO MDM_SUB_ID_MAP(ID,FORM_ID,MDM_ID,SUB_TB_PK_ID,MDM_SUB_ID,ESB_ID,ESB_SUB_ID) VALUES(#{id},#{formId},#{mdmId},#{uuId},#{mdmSubId},#{esbId},#{esbSubId})
+    </insert>
+
+    <delete id="deleteNotInValues">
+      DELETE FROM MDM_SUB_ID_MAP WHERE FORM_ID = #{fromId} AND MDM_ID = #{mdmId} AND SUB_TB_PK_ID = #{uuid} AND ESB_SUB_ID NOT IN
+      <foreach collection="esbSubIds" index="index" item="esbSubId" open="(" separator="," close=")">#{esbSubId}</foreach>
+    </delete>
+</mapper>

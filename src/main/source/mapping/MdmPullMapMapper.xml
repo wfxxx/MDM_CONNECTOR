@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.definesys.mdm.connector.mapper.MdmPullMapper">
+
+    <resultMap id="BaseResultMap" type="com.definesys.mdm.connector.entity.MdmPullMap">
+        <result column="LAST_PULL_DATE" jdbcType="VARCHAR" property="lastPullDate" />
+        <result column="FORM_ID" jdbcType="VARCHAR" property="formId" />
+    </resultMap>
+
+    <select id="getLastPullDate"  resultMap="BaseResultMap">
+        SELECT FORM_ID,LAST_PULL_DATE FROM MDM_PULL_MAP WHERE FORM_ID = #{formId}
+    </select>
+
+    <insert id="insertPullMap">
+      INSERT INTO MDM_PULL_MAP(ID,FORM_ID,LAST_PULL_DATE) VALUES(#{id},#{now},#{formId})
+    </insert>
+
+    <update id="updatePullMap">
+        UPDATE MDM_PULL_MAP SET LAST_PULL_DATE = #{now} WHERE FORM_ID = #{formId}
+    </update>
+</mapper>

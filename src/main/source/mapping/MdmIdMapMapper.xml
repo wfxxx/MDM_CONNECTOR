@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.definesys.mdm.connector.mapper.MdmIdMapMapper">
+
+    <resultMap id="BaseResultMap" type="com.definesys.mdm.connector.entity.MdmIdMap">
+        <result column="MDM_ID" jdbcType="VARCHAR" property="mdmid" />
+        <result column="ESB_ID" jdbcType="VARCHAR" property="esbid" />
+        <result column="FORM_ID" jdbcType="VARCHAR" property="formid" />
+    </resultMap>
+
+    <select id="getMdmId"  resultMap="BaseResultMap">
+        select MDM_ID,ESB_ID,FORM_ID from MDM_ID_MAP where FORM_ID = #{formId} and ESB_ID = #{esbId}
+    </select>
+
+    <insert id="insertMdmId">
+        INSERT INTO MDM_ID_MAP(ID,MDM_ID,FORM_ID,ESB_ID) VALUES(#{Id},#{mdmId},#{formId},#{esbId})
+    </insert>
+</mapper>

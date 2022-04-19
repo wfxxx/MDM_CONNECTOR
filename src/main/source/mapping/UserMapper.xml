@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.definesys.mdm.connector.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.definesys.mdm.connector.entity.User">
+        <result column="ID" jdbcType="INTEGER" property="ID" />
+        <result column="NAME" jdbcType="VARCHAR" property="NAME" />
+        <result column="CREDENTIAL_NO" jdbcType="VARCHAR" property="CREDENTIAL_NO" />
+        <result column="PHONE" jdbcType="VARCHAR" property="PHONE" />
+        <result column="EMAIL" jdbcType="VARCHAR" property="EMAIL"/>
+    </resultMap>
+
+    <select id="Sel" resultType="com.definesys.mdm.connector.entity.User">
+        select * from S_HUMAN_G where MDM_CODE = #{mdmCode}
+    </select>
+</mapper>

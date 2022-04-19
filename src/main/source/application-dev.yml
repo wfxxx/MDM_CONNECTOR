@@ -1,0 +1,38 @@
+
+server:
+  port: 8080
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: demdm2021
+    url: jdbc:mysql://10.1.1.92:3306/demdm?serverTimezone=GMT%2B8&useUnicode=true&passwordCharacterEncoding=utf-8&characterEncoding=utf-8
+
+mybatis:
+  mapper-locations: classpath:mapping/*Mapper.xml
+mdm:
+  app_id: d330c04def0e4c4b8fd1158e5d94e1bb
+  app_key: 5b8ef9080c0c4b32a6adfee46528222b
+  uri: http://10.1.1.93/
+  getTokenPath: /demdm-api/open/api/getToken
+  getUserByCode: /demdm-api/open/api/getUserInfoByCode
+  getUserByMdmCode: /demdm-api/open/api/getUserInfoByMdmCode
+  saveApi: /demdm-api/open/api/saveApi
+  updateApi: /demdm-api/open/api/updateApi
+  addUser: /demdm-api/open/api/addUser
+esb:
+  uri: http://10.1.1.76/
+  user: MDM
+  pass: hfmdm@123
+ad:
+  newBaseUri: ldap://172.20.241.20:389
+  yongFu: ldap://172.17.250.100:389
+
+#logging:
+#  level:
+#    com:
+#      definesys:
+#        mdm:
+#          connector:
+#            mapper:
+#              MdmSubIdMapMapper: debug
