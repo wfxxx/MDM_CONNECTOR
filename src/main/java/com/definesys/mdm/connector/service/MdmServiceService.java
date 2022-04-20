@@ -430,6 +430,27 @@ public class MdmServiceService {
     }
 
     /**
+     * 调用主数据
+     * @param mdmRequest
+     * @return
+     */
+    public String enableOrDisableApi(MdmRequest mdmRequest) throws IOException {
+        System.out.println(mdmRequest);
+        String MdmRtnStr = "";
+        //根据sourceId查询主数据ID
+        MdmIdMap mdmIdMap = idMapMapper.getMdmId(mdmRequest.getFormId(), mdmRequest.getSourceId());
+        System.out.println(mdmIdMap);
+        if (mdmIdMap != null && mdmIdMap.getMdmid() != null){
+            MdmEnableDisableRequest mdmEnableDisableRequest = MdmEnableDisableRequest.builder().formId(mdmRequest.getFormId()).apiManageId(mdmRequest.getFormId()).documentId(mdmIdMap.getMdmid()).status(mdmRequest.getStatus()).build();
+            String s = HttpUtil.sendPostDataByJson(MdmAuthUtil.getEnableOrDisableApi(), MdmAuthUtil.getMdmRequestHeader(), GsonUtil.toJsonString(mdmEnableDisableRequest));
+            return s;
+        }
+        //中间映射表没查询到数据
+        MdmRtnStr = GsonUtil.toJsonString(MdmChildVo.getErrObj("主数据没有此数据"));
+        return MdmRtnStr;
+    }
+
+    /**
      * 获取主数据拉取时间
      * @param formId
      * @return
@@ -590,9 +611,9 @@ public class MdmServiceService {
     public String adLogin(String loginName, String password) {
         boolean b = Ldap.domainAuthenticate(loginName, password);
         if(b){
-            return GsonUtil.toJsonString(MdmChildVo.builder().build().getOkObj("登录成功"));
+            return GsonUtil.toJsonString(MdmChildVo.getOkObj("登录成功"));
         }
-        return GsonUtil.toJsonString(MdmChildVo.builder().build().getErrObj("登录失败"));
+        return GsonUtil.toJsonString(MdmChildVo.getErrObj("登录失败"));
     }
 
 

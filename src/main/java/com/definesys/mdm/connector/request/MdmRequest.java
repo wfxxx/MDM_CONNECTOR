@@ -24,6 +24,7 @@ public class MdmRequest<T> {
     private T childData;
     private String createBy;
     private String updateBy;
+    private String status;
 
 
 

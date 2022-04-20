@@ -83,7 +83,10 @@ public class MdmServiceController {
         return mdmServiceService.pullCommonSubData2(mdmPullRequest);
     }
 
-
+    @RequestMapping(value = "/enableOrDisableApi",produces = "application/json;charset=UTF-8")
+    public String enableOrDisableApi(@RequestBody MdmRequest mdmRequest) throws IOException {
+        return mdmServiceService.enableOrDisableApi(mdmRequest);
+    }
 
 
     @RequestMapping(value = "/GetUserInfoByMDMCode",produces = "application/json;charset=UTF-8")

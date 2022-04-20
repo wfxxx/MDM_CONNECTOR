@@ -24,23 +24,25 @@ import java.util.Map;
 public class MdmAuthUtil {
 
 
-    public static String app_Id;
+    private static String app_Id;
 
-    public static String app_Key;
+    private static String app_Key;
 
-    public static String mdmUri;
+    private static String mdmUri;
 
-    public static String getTokenPath;
+    private static String getTokenPath;
 
-    public static String getUserByCode;
+    private static String getUserByCode;
 
-    public static String getUserByMdmCode;
+    private static String getUserByMdmCode;
 
-    public static String saveApi;
+    private static String saveApi;
 
-    public static String updateApi;
+    private static String updateApi;
 
-    public static String addUser;
+    private static String addUser;
+
+    private static String enableOrDisableApi;
 
 
     @Value(value = "${mdm.app_id}")
@@ -71,6 +73,10 @@ public class MdmAuthUtil {
     public void setUpdateApi(String updateApi) { MdmAuthUtil.updateApi = updateApi; }
     @Value(value = "${mdm.addUser}")
     public void setAddUser(String addUser){ MdmAuthUtil.addUser = addUser;}
+    @Value(value = "${mdm.enableOrDisableApi}")
+    public void setEnableOrDisableApi(String enableOrDisableApi){
+        MdmAuthUtil.enableOrDisableApi = enableOrDisableApi;
+    }
 
     public static String getMDMToken(){
         String token = "";
@@ -180,6 +186,12 @@ public class MdmAuthUtil {
 
     /**返回MDM UpdateAPI*/
     public static String getUpdateApi() { return mdmUri+updateApi; }
+
+    /**返回MDM禁用接口的 API*/
+    public static String getEnableOrDisableApi(){
+        return mdmUri+enableOrDisableApi;
+
+    }
 
     public static String getAddUserUri(){ return mdmUri+addUser; }
 

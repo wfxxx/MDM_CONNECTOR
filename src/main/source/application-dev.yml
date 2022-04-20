@@ -20,6 +20,7 @@ mdm:
   saveApi: /demdm-api/open/api/saveApi
   updateApi: /demdm-api/open/api/updateApi
   addUser: /demdm-api/open/api/addUser
+  enableOrDisableApi: /demdm-api/open/api/enableOrDisableApi
 esb:
   uri: http://10.1.1.76/
   user: MDM
