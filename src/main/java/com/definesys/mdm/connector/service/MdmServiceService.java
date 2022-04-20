@@ -157,7 +157,7 @@ public class MdmServiceService {
      * @throws IOException
      */
     public String saveUpdateWithSubApi2(MdmRequest mdmRequest) throws IOException {
-        String rtnString = GsonUtil.toJsonString(new MdmChildVo().getErrObj("未知错误"));
+        String rtnString = GsonUtil.toJsonString(MdmChildVo.getErrObj("未知错误"));
         if(mdmRequest.getSourceId() != null && !mdmRequest.getSourceId().isEmpty()) {
             //根据第三方ID查询MDM_ID
             MdmIdMap mdmIdMap = idMapMapper.getMdmId(mdmRequest.getFormId(), mdmRequest.getSourceId());
@@ -214,6 +214,7 @@ public class MdmServiceService {
                     filterMdmSubIdMapList(filterRtnSubIdMapList,mdmSubIdMapList,esbSubIdMapList);
                     System.out.println("过滤后的新增的主数据："+mdmSubIdMapList);
 
+                    System.out.println("esbSubIdMapList："+esbSubIdMapList);
                     for (int i = 0; i < esbSubIdMapList.size(); i++) {
                         Map<String, Object> esbSubIdMap = esbSubIdMapList.get(i);
                         Map<String, Object> mdmSubIdMap = mdmSubIdMapList.get(i);
@@ -236,7 +237,7 @@ public class MdmServiceService {
     }
 
     /**
-     * 根据一对一的关系建立成一对多的关系
+     * 根据一对一的关系建立成一对多的关系(saveUpdateWithSubApi2使用)
      * @param notDeleteSubIdMapList
      * @return
      */
@@ -354,9 +355,13 @@ public class MdmServiceService {
             List listdata = (List) esbRtnDto.getRtnData();
             //循环写入主数据
             for (Object obj : listdata){
-                MdmRequest requestBodyDto = MdmRequest.builder().formId(mdmPullRequest.getFormId()).apiManageId(mdmPullRequest.getApiManageId()).sourceId(mdmPullRequest.getSourceId()).data(obj).build();
+                Map childData = MapUtil.getAny((Map) obj,"rtnChildData");
+                String createBy = MapUtil.getStr((Map) obj,"createBy");
+                String updateBy = MapUtil.getStr((Map) obj,"updateBy");
+                String sourceId = MapUtil.getStr((Map) obj,mdmPullRequest.getSourceId());
+                MdmRequest requestBodyDto = MdmRequest.builder().formId(mdmPullRequest.getFormId()).apiManageId(mdmPullRequest.getApiManageId()).sourceId(sourceId).createBy(createBy).updateBy(updateBy).data(obj).childData(childData).build();
                 MdmChildVo mdmRtn = GsonUtil.toJsonObject(saveUpdateWithSubApi(requestBodyDto), MdmChildVo.class);
-                if("error".equals(mdmRtn.getCode())){
+                if(!mdmRtn.isRtnOk()){
                     throw new MdmHttpExceprion("调用主数据接口异常");
                 }
             }
@@ -373,6 +378,54 @@ public class MdmServiceService {
         //将ESB返回的异常信息返回给主数据
         mdmRtnDto.setErroRtn(esbRtnDto.getRtnMsg());
         mdmRtnDtoJson = new Gson().toJson(mdmRtnDto);
+        return mdmRtnDtoJson;
+    }
+
+    /**
+     * MDM拉取带子表接口，子表不为全删除
+     * @param mdmPullRequest
+     * @return
+     */
+    public String pullCommonSubData2(MdmPullRequest mdmPullRequest) throws IOException {
+        //定义主数据返回对象
+        String mdmRtnDtoJson = "";
+        //上次拉取时间
+        String lastPullDateString = getLastPullDate(mdmPullRequest.getFormId());
+        EsbPullRequest esbPullRequest = EsbPullRequest.builder().time(lastPullDateString).build();
+        //调用ESB接口
+        String esbRtnString = HttpUtil.sendPostDataByJson(EsbUtil.esbUri + mdmPullRequest.getEsbUrl(), EsbUtil.getEsbHeader(), GsonUtil.toJsonString(esbPullRequest));
+        //处理ESB返回
+        EsbRtnVo esbRtnVo = GsonUtil.toJsonObject(esbRtnString,EsbRtnVo.class);
+        if(esbRtnVo.isOkRtn()){
+            //查询成功，循环rtnData
+            List listdata = (List) esbRtnVo.getRtnData();
+            for(Object obj: listdata){
+                Map childData = (Map) MapUtil.getAny((Map) obj,"rtnChildData").get("rtnChildData");
+                String createBy = MapUtil.getStr((Map) obj,"createBy");
+                String updateBy = MapUtil.getStr((Map) obj,"updateBy");
+                String sourceId = MapUtil.getStr((Map) obj,mdmPullRequest.getSourceId());
+                System.out.println(childData);
+                deleteKeyOfMap((Map) obj,"rtnChildData");
+                //循环请求子表
+                MdmRequest mdmRequest = MdmRequest.builder().formId(mdmPullRequest.getFormId()).apiManageId(mdmPullRequest.getApiManageId()).sourceId(sourceId).createBy(createBy).updateBy(updateBy).data(obj).childData(childData).build();
+                String s = saveUpdateWithSubApi2(mdmRequest);
+                MdmChildVo mdmChildVo = GsonUtil.toJsonObject(s,MdmChildVo.class);
+                if(!mdmChildVo.isRtnOk()){
+                    throw new MdmHttpExceprion("调用主数据接口异常");
+                }
+            }
+            //写入主数据成功，反写当前时间
+            if(pullDateIsNotEmpty(mdmPullRequest.getFormId())){
+                pullMapper.updatePullMap(DateUtil.now(),mdmPullRequest.getFormId());
+            }
+            else{
+                pullMapper.insertPullMap(StringUtil.getUuid(),DateUtil.now(),mdmPullRequest.getFormId());
+            }
+            MdmChildVo ok = MdmChildVo.getOkObj("拉取数据成功");
+            return GsonUtil.toJsonString(ok);
+        }
+        //返回异常信息
+        mdmRtnDtoJson = GsonUtil.toJsonString(MdmChildVo.getErrObj(esbRtnVo.getRtnMsg()));
         return mdmRtnDtoJson;
     }
 
@@ -420,12 +473,15 @@ public class MdmServiceService {
         List<Map<String, Object>> notDeleteSubIdMapList = new ArrayList<>();
 
         Map<String, Object> childtableIds = (Map<String, Object>) vo.getChildData();
+        System.out.println(childtableIds);
 
         if (childtableIds != null) {
             Iterator<String> iter = childtableIds.keySet().iterator();
             //遍历字表uuid
             while (iter.hasNext()) {
                 String uuid = iter.next();
+                System.out.println(uuid);
+                System.out.println(childtableIds.get(uuid));
                 List<Map> uuidMapList = (List<Map>) childtableIds.get(uuid);
                 //遍历某个字表里面的数据
                 for (int i = 0 ; i<uuidMapList.size(); i++) {

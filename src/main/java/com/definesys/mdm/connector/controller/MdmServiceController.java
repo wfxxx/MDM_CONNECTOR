@@ -78,6 +78,11 @@ public class MdmServiceController {
         return mdmServiceService.pullCommonSubData(mdmPullRequest);
     }
 
+    @RequestMapping(value = "/pull_common_sub_data2",produces = "application/json;charset=UTF-8")
+    public String pullCommonSubData2(@RequestBody MdmPullRequest mdmPullRequest) throws IOException {
+        return mdmServiceService.pullCommonSubData2(mdmPullRequest);
+    }
+
 
 
 

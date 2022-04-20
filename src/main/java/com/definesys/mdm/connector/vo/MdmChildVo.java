@@ -74,12 +74,12 @@ public class MdmChildVo<T> {
         this.messgae = messgae;
     }
 
-    public MdmChildVo getErrObj(String messgae){
+    public static MdmChildVo getErrObj(String messgae){
         MdmChildVo<Object> error = MdmChildVo.builder().code("error").messgae(messgae).build();
         return error;
     }
 
-    public MdmChildVo getOkObj(String messgae){
+    public static MdmChildVo getOkObj(String messgae){
         MdmChildVo<Object> ok = MdmChildVo.builder().code("ok").messgae(messgae).build();
         return ok;
     }

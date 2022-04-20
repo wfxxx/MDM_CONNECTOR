@@ -21,6 +21,8 @@ import java.util.Map;
 @Service
 public class EsbUtil {
 
+    private static final String REQ_FROM = "MDM";
+
     public static String esbUri;
 
     private static String user;
@@ -38,6 +40,8 @@ public class EsbUtil {
     public static Map<String,String> getEsbHeader(){
         Map<String,String> map = new HashMap<>();
         map.put("Authorization","Basic "+Base64Encoder.encode(user+":"+pass));
+        map.put("reqId",StringUtil.getUuid());
+        map.put("reqFrom",REQ_FROM);
         return map;
     }
 
