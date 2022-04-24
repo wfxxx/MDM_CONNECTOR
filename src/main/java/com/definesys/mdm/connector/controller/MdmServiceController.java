@@ -4,6 +4,8 @@ import com.definesys.mdm.connector.dto.AdAutho;
 import com.definesys.mdm.connector.request.MdmPullRequest;
 import com.definesys.mdm.connector.request.MdmRequest;
 import com.definesys.mdm.connector.service.MdmServiceService;
+import com.definesys.mdm.connector.util.GsonUtil;
+import com.definesys.mdm.connector.vo.MdmChildVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,17 @@ public class MdmServiceController {
 
     @Autowired
     private MdmServiceService mdmServiceService;
+
+    /**
+     * 测试参数接口
+     * @param mdmRequest
+     * @return
+     */
+    @RequestMapping(value = "/test",produces = "application/json;charset=UTF-8")
+    public String saveUpdateApi(@RequestBody String mdmRequest) throws IOException {
+        System.out.println(mdmRequest);
+        return GsonUtil.toJsonString(MdmChildVo.getOkObj("成功"));
+    }
 
     /**
      * 新增或更新接口
