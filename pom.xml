@@ -9,8 +9,8 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.definesys.mdm</groupId>
-    <artifactId>connecotor</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>mdm-connecotor</artifactId>
+    <version>1.0</version>
     <name>connecotor</name>
     <description>Demo project for Spring Boot</description>
     <properties>
